@@ -1,0 +1,930 @@
+{
+  "components": {
+    "responses": {
+      "forbiddenError": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponseBody"
+            }
+          }
+        },
+        "description": "ForbiddenError is returned if the user/token has insufficient permissions to access the requested resource."
+      },
+      "badRequestError": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponseBody"
+            }
+          }
+        },
+        "description": "BadRequestError is returned when the request is invalid and it cannot be processed."
+      },
+      "internalServerError": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponseBody"
+            }
+          }
+        },
+        "description": "InternalServerError is a general error indicating something went wrong internally."
+      },
+      "getDataSourcesResponse": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/DataSourceList"
+            }
+          }
+        },
+        "description": "(empty)"
+      },
+      "unauthorisedError": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponseBody"
+            }
+          }
+        },
+        "description": "UnauthorizedError is returned when the request is not authenticated."
+      },
+      "queryMetricsWithExpressionsRespons": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/QueryDataResponse"
+            }
+          }
+        },
+        "description": "(empty)"
+      }
+    },
+    "schemas": {
+      "ErrorResponseBody": {
+        "properties": {
+          "error": {
+            "description": "Error An optional detailed description of the actual error. Only included if running in developer mode.",
+            "type": "string"
+          },
+          "message": {
+            "description": "a human readable version of the error",
+            "type": "string"
+          },
+          "status": {
+            "description": "Status An optional status to denote the cause of the error.\n\nFor example, a 412 Precondition Failed error may include additional information of why that error happened.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "type": "object"
+      },
+      "MetricRequest": {
+        "properties": {
+          "debug": {
+            "type": "boolean"
+          },
+          "from": {
+            "description": "From Start time in epoch timestamps in milliseconds or relative using Grafana time units.",
+            "example": "now-1h",
+            "type": "string"
+          },
+          "queries": {
+            "description": "queries.refId \u2013 Specifies an identifier of the query. Is optional and default to \u201cA\u201d.\nqueries.datasourceId \u2013 Specifies the data source to be queried. Each query in the request must have an unique datasourceId.\nqueries.maxDataPoints - Species maximum amount of data points that dashboard panel can render. Is optional and default to 100.\nqueries.intervalMs - Specifies the time interval in milliseconds of time series. Is optional and defaults to 1000.",
+            "example": [
+              {
+                "datasource": {
+                  "uid": "PROMETHEUS_UID_FROM_GETDATASOURCES"
+                },
+                "expr": "kube_pod_container_status_waiting_reason{reason=\"CrashLoopBackOff\"}",
+                "refId": "A"
+              }
+            ],
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "to": {
+            "description": "To End time in epoch timestamps in milliseconds or relative using Grafana time units.",
+            "example": "now",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "queries"
+        ],
+        "type": "object"
+      },
+      "Json": {
+        "type": "object"
+      },
+      "DataSourceList": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "access": {
+              "type": "string"
+            },
+            "basicAuth": {
+              "type": "boolean"
+            },
+            "database": {
+              "type": "string"
+            },
+            "id": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "isDefault": {
+              "type": "boolean"
+            },
+            "jsonData": {
+              "type": "object"
+            },
+            "name": {
+              "type": "string"
+            },
+            "orgId": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "readOnly": {
+              "type": "boolean"
+            },
+            "type": {
+              "type": "string"
+            },
+            "typeLogoUrl": {
+              "type": "string"
+            },
+            "typeName": {
+              "type": "string"
+            },
+            "uid": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "QueryDataResponse": {
+        "description": "It is the return type of a QueryData call.",
+        "properties": {
+          "results": {
+            "type": "object",
+            "description": "Responses is a map of RefIDs (Unique Query ID) to DataResponses.",
+            "additionalProperties": {
+              "type": "object",
+              "description": "DataResponse contains the results from a DataQuery.",
+              "properties": {
+                "Error": {
+                  "type": "string",
+                  "description": "Error is a property to be set if the corresponding DataQuery has an error."
+                },
+                "ErrorSource": {
+                  "type": "string",
+                  "description": "Source type defines the status source."
+                },
+                "Frames": {
+                  "type": "array",
+                  "description": "Frames is a slice of Frame pointers.",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "Status": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          }
+        },
+        "title": "QueryDataResponse contains the results from a QueryDataRequest.",
+        "type": "object"
+      },
+      "DataSourceListItemDTO": {
+        "properties": {
+          "access": {
+            "type": "string"
+          },
+          "basicAuth": {
+            "type": "boolean"
+          },
+          "database": {
+            "type": "string"
+          },
+          "id": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "isDefault": {
+            "type": "boolean"
+          },
+          "jsonData": {
+            "type": "object"
+          },
+          "name": {
+            "type": "string"
+          },
+          "orgId": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "readOnly": {
+            "type": "boolean"
+          },
+          "type": {
+            "type": "string"
+          },
+          "typeLogoUrl": {
+            "type": "string"
+          },
+          "typeName": {
+            "type": "string"
+          },
+          "uid": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "user": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Responses": {
+        "additionalProperties": {
+          "$ref": "#/components/schemas/DataResponse"
+        },
+        "description": "The QueryData method the QueryDataHandler method will set the RefId\nproperty on the DataResponses' frames based on these RefIDs.",
+        "title": "Responses is a map of RefIDs (Unique Query ID) to DataResponses.",
+        "type": "object"
+      },
+      "DsAccess": {
+        "type": "string"
+      },
+      "DataResponse": {
+        "description": "A map of RefIDs (unique query identifiers) to this type makes up the Responses property of a QueryDataResponse.\nThe Error property is used to allow for partial success responses from the containing QueryDataResponse.",
+        "properties": {
+          "Error": {
+            "description": "Error is a property to be set if the corresponding DataQuery has an error.",
+            "type": "string"
+          },
+          "ErrorSource": {
+            "type": "string",
+            "title": "Source type defines the status source."
+          },
+          "Frames": {
+            "$ref": "#/components/schemas/Frames"
+          },
+          "Status": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "title": "DataResponse contains the results from a DataQuery.",
+        "type": "object"
+      },
+      "Source": {
+        "title": "Source type defines the status source.",
+        "type": "string"
+      },
+      "Frames": {
+        "description": "It is the main data container within a backend.DataResponse.\nThere should be no `nil` entries in the Frames slice (making them pointers was a mistake).",
+        "items": {
+          "$ref": "#/components/schemas/Frame"
+        },
+        "title": "Frames is a slice of Frame pointers.",
+        "type": "array"
+      },
+      "Status": {
+        "format": "int64",
+        "type": "integer"
+      },
+      "Frame": {
+        "description": "Each Field is well typed by its FieldType and supports optional Labels.\n\nA Frame is a general data container for Grafana. A Frame can be table data\nor time series data depending on its content and field types.",
+        "properties": {
+          "Fields": {
+            "description": "Fields are the columns of a frame.\nAll Fields must be of the same the length when marshalling the Frame for transmission.\nThere should be no `nil` entries in the Fields slice (making them pointers was a mistake).",
+            "items": {
+              "$ref": "#/components/schemas/Field"
+            },
+            "type": "array"
+          },
+          "Meta": {
+            "$ref": "#/components/schemas/FrameMeta"
+          },
+          "Name": {
+            "description": "Name is used in some Grafana visualizations.",
+            "type": "string"
+          },
+          "RefID": {
+            "description": "RefID is a property that can be set to match a Frame to its originating query.",
+            "type": "string"
+          }
+        },
+        "title": "Frame is a columnar data structure where each column is a Field.",
+        "type": "object"
+      },
+      "Field": {
+        "description": "A Field is essentially a slice of various types with extra properties and methods.\nSee NewField() for supported types.\n\nThe slice data in the Field is a not exported, so methods on the Field are used to to manipulate its data.",
+        "properties": {
+          "config": {
+            "$ref": "#/components/schemas/FieldConfig"
+          },
+          "labels": {
+            "$ref": "#/components/schemas/FrameLabels"
+          },
+          "name": {
+            "description": "Name is default identifier of the field. The name does not have to be unique, but the combination\nof name and Labels should be unique for proper behavior in all situations.",
+            "type": "string"
+          }
+        },
+        "title": "Field represents a typed column of data within a Frame.",
+        "type": "object"
+      },
+      "FieldConfig": {
+        "properties": {
+          "color": {
+            "additionalProperties": {},
+            "description": "Map values to a display color\nNOTE: this interface is under development in the frontend... so simple map for now",
+            "type": "object"
+          },
+          "custom": {
+            "additionalProperties": {},
+            "description": "Panel Specific Values",
+            "type": "object"
+          },
+          "decimals": {
+            "format": "uint16",
+            "type": "integer"
+          },
+          "description": {
+            "description": "Description is human readable field metadata",
+            "type": "string"
+          },
+          "displayName": {
+            "description": "DisplayName overrides Grafana default naming, should not be used from a data source",
+            "type": "string"
+          },
+          "displayNameFromDS": {
+            "description": "DisplayNameFromDS overrides Grafana default naming strategy.",
+            "type": "string"
+          },
+          "filterable": {
+            "description": "Filterable indicates if the Field's data can be filtered by additional calls.",
+            "type": "boolean"
+          },
+          "interval": {
+            "description": "Interval indicates the expected regular step between values in the series.\nWhen an interval exists, consumers can identify \"missing\" values when the expected value is not present.\nThe grafana timeseries visualization will render disconnected values when missing values are found it the time field.\nThe interval uses the same units as the values.  For time.Time, this is defined in milliseconds.",
+            "format": "double",
+            "type": "number"
+          },
+          "links": {
+            "description": "The behavior when clicking on a result",
+            "items": {
+              "$ref": "#/components/schemas/DataLink"
+            },
+            "type": "array"
+          },
+          "mappings": {
+            "$ref": "#/components/schemas/ValueMappings"
+          },
+          "max": {
+            "type": "number",
+            "format": "double",
+            "description": "ConfFloat64 is a float64. It Marshals float64 values of NaN of Inf to null."
+          },
+          "min": {
+            "type": "number",
+            "format": "double",
+            "description": "ConfFloat64 is a float64. It Marshals float64 values of NaN of Inf to null."
+          },
+          "noValue": {
+            "description": "Alternative to empty string",
+            "type": "string"
+          },
+          "path": {
+            "description": "Path is an explicit path to the field in the datasource. When the frame meta includes a path,\nthis will default to `${frame.meta.path}/${field.name}\n\nWhen defined, this value can be used as an identifier within the datasource scope, and\nmay be used as an identifier to update values in a subsequent request",
+            "type": "string"
+          },
+          "thresholds": {
+            "$ref": "#/components/schemas/ThresholdsConfig"
+          },
+          "type": {
+            "$ref": "#/components/schemas/FieldTypeConfig"
+          },
+          "unit": {
+            "description": "Numeric Options",
+            "type": "string"
+          },
+          "writeable": {
+            "description": "Writeable indicates that the datasource knows how to update this value",
+            "type": "boolean"
+          }
+        },
+        "title": "FieldConfig represents the display properties for a Field.",
+        "type": "object"
+      },
+      "DataLink": {
+        "description": "DataLink define what",
+        "properties": {
+          "internal": {
+            "$ref": "#/components/schemas/InternalDataLink"
+          },
+          "targetBlank": {
+            "type": "boolean"
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ConfFloat64": {
+        "description": "ConfFloat64 is a float64. It Marshals float64 values of NaN of Inf\nto null.",
+        "format": "double",
+        "type": "number"
+      },
+      "ThresholdsConfig": {
+        "description": "ThresholdsConfig setup thresholds",
+        "properties": {
+          "mode": {
+            "type": "string",
+            "description": "ThresholdsMode absolute or percentage"
+          },
+          "steps": {
+            "description": "Must be sorted by 'value', first value is always -Infinity",
+            "items": {
+              "$ref": "#/components/schemas/Threshold"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "FrameMeta": {
+        "description": "https://github.com/grafana/grafana/blob/master/packages/grafana-data/src/types/data.ts#L11\nNOTE -- in javascript this can accept any `[key: string]: any;` however\nthis interface only exposes the values we want to be exposed",
+        "properties": {
+          "channel": {
+            "description": "Channel is the path to a stream in grafana live that has real-time updates for this data.",
+            "type": "string"
+          },
+          "custom": {
+            "description": "Custom datasource specific values."
+          },
+          "dataTopic": {
+            "type": "string",
+            "title": "DataTopic is used to identify which topic the frame should be assigned to."
+          },
+          "executedQueryString": {
+            "description": "ExecutedQueryString is the raw query sent to the underlying system. All macros and templating\nhave been applied.  When metadata contains this value, it will be shown in the query inspector.",
+            "type": "string"
+          },
+          "notices": {
+            "description": "Notices provide additional information about the data in the Frame that\nGrafana can display to the user in the user interface.",
+            "items": {
+              "$ref": "#/components/schemas/Notice"
+            },
+            "type": "array"
+          },
+          "path": {
+            "description": "Path is a browsable path on the datasource.",
+            "type": "string"
+          },
+          "pathSeparator": {
+            "description": "PathSeparator defines the separator pattern to decode a hierarchy. The default separator is '/'.",
+            "type": "string"
+          },
+          "preferredVisualisationPluginId": {
+            "description": "PreferredVisualizationPluginId sets the panel plugin id to use to render the data when using Explore. If\nthe plugin cannot be found will fall back to PreferredVisualization.",
+            "type": "string"
+          },
+          "preferredVisualisationType": {
+            "type": "string",
+            "title": "VisType is used to indicate how the data should be visualized in explore."
+          },
+          "stats": {
+            "description": "Stats is an array of query result statistics.",
+            "items": {
+              "$ref": "#/components/schemas/QueryStat"
+            },
+            "type": "array"
+          },
+          "type": {
+            "type": "string",
+            "description": "A FrameType string, when present in a frame's metadata, asserts that the frame's structure conforms to the FrameType's specification."
+          },
+          "typeVersion": {
+            "$ref": "#/components/schemas/FrameTypeVersion"
+          },
+          "uniqueRowIdFields": {
+            "description": "Array of field indices which values create a unique id for each row. Ideally this should be globally unique ID\nbut that isn't guarantied. Should help with keeping track and deduplicating rows in visualizations, especially\nwith streaming data with frequent updates.",
+            "example": "TraceID in Tempo, table name + primary key in SQL",
+            "items": {
+              "format": "int64",
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "title": "FrameMeta matches:",
+        "type": "object"
+      },
+      "DataTopic": {
+        "description": "nolint:revive",
+        "title": "DataTopic is used to identify which topic the frame should be assigned to.",
+        "type": "string"
+      },
+      "FrameTypeVersion": {
+        "items": {
+          "format": "uint64",
+          "type": "integer"
+        },
+        "title": "FrameType is a 2 number version (Major / Minor).",
+        "type": "array"
+      },
+      "InternalDataLink": {
+        "description": "InternalDataLink definition to allow Explore links to be constructed in the backend",
+        "properties": {
+          "datasourceName": {
+            "type": "string"
+          },
+          "datasourceUid": {
+            "type": "string"
+          },
+          "panelsState": {
+            "$ref": "#/components/schemas/ExplorePanelsState"
+          },
+          "query": {},
+          "timeRange": {
+            "$ref": "#/components/schemas/TimeRange"
+          },
+          "transformations": {
+            "items": {
+              "$ref": "#/components/schemas/LinkTransformationConfig"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "QueryStat": {
+        "description": "The embedded FieldConfig's display name must be set.\nIt corresponds to the QueryResultMetaStat on the frontend (https://github.com/grafana/grafana/blob/master/packages/grafana-data/src/types/data.ts#L53).",
+        "properties": {
+          "color": {
+            "additionalProperties": {},
+            "description": "Map values to a display color\nNOTE: this interface is under development in the frontend... so simple map for now",
+            "type": "object"
+          },
+          "custom": {
+            "additionalProperties": {},
+            "description": "Panel Specific Values",
+            "type": "object"
+          },
+          "decimals": {
+            "format": "uint16",
+            "type": "integer"
+          },
+          "description": {
+            "description": "Description is human readable field metadata",
+            "type": "string"
+          },
+          "displayName": {
+            "description": "DisplayName overrides Grafana default naming, should not be used from a data source",
+            "type": "string"
+          },
+          "displayNameFromDS": {
+            "description": "DisplayNameFromDS overrides Grafana default naming strategy.",
+            "type": "string"
+          },
+          "filterable": {
+            "description": "Filterable indicates if the Field's data can be filtered by additional calls.",
+            "type": "boolean"
+          },
+          "interval": {
+            "description": "Interval indicates the expected regular step between values in the series.\nWhen an interval exists, consumers can identify \"missing\" values when the expected value is not present.\nThe grafana timeseries visualization will render disconnected values when missing values are found it the time field.\nThe interval uses the same units as the values.  For time.Time, this is defined in milliseconds.",
+            "format": "double",
+            "type": "number"
+          },
+          "links": {
+            "description": "The behavior when clicking on a result",
+            "items": {
+              "$ref": "#/components/schemas/DataLink"
+            },
+            "type": "array"
+          },
+          "mappings": {
+            "$ref": "#/components/schemas/ValueMappings"
+          },
+          "max": {
+            "type": "number",
+            "format": "double",
+            "description": "ConfFloat64 is a float64. It Marshals float64 values of NaN of Inf to null."
+          },
+          "min": {
+            "type": "number",
+            "format": "double",
+            "description": "ConfFloat64 is a float64. It Marshals float64 values of NaN of Inf to null."
+          },
+          "noValue": {
+            "description": "Alternative to empty string",
+            "type": "string"
+          },
+          "path": {
+            "description": "Path is an explicit path to the field in the datasource. When the frame meta includes a path,\nthis will default to `${frame.meta.path}/${field.name}\n\nWhen defined, this value can be used as an identifier within the datasource scope, and\nmay be used as an identifier to update values in a subsequent request",
+            "type": "string"
+          },
+          "thresholds": {
+            "$ref": "#/components/schemas/ThresholdsConfig"
+          },
+          "type": {
+            "$ref": "#/components/schemas/FieldTypeConfig"
+          },
+          "unit": {
+            "description": "Numeric Options",
+            "type": "string"
+          },
+          "value": {
+            "format": "double",
+            "type": "number"
+          },
+          "writeable": {
+            "description": "Writeable indicates that the datasource knows how to update this value",
+            "type": "boolean"
+          }
+        },
+        "title": "QueryStat is used for storing arbitrary statistics metadata related to a query and its result, e.g. total request time, data processing time.",
+        "type": "object"
+      },
+      "LinkTransformationConfig": {
+        "properties": {
+          "expression": {
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          },
+          "mapValue": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "FieldTypeConfig": {
+        "description": "FieldTypeConfig has type specific configs, only one should be active at a time",
+        "properties": {
+          "enum": {
+            "$ref": "#/components/schemas/EnumFieldConfig"
+          }
+        },
+        "type": "object"
+      },
+      "ValueMappings": {
+        "items": {
+          "$ref": "#/components/schemas/ValueMapping"
+        },
+        "type": "array"
+      },
+      "Threshold": {
+        "description": "Threshold a single step on the threshold list",
+        "properties": {
+          "color": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number",
+            "format": "double",
+            "description": "ConfFloat64 is a float64. It Marshals float64 values of NaN of Inf to null."
+          }
+        },
+        "type": "object"
+      },
+      "ValueMapping": {
+        "description": "ValueMapping allows mapping input values to text and color",
+        "type": "object"
+      },
+      "FrameType": {
+        "description": "A FrameType string, when present in a frame's metadata, asserts that the\nframe's structure conforms to the FrameType's specification.\nThis property is currently optional, so FrameType may be FrameTypeUnknown even if the properties of\nthe Frame correspond to a defined FrameType.\n+enum",
+        "type": "string"
+      },
+      "EnumFieldConfig": {
+        "description": "Enum field config\nVector values are used as lookup keys into the enum fields",
+        "properties": {
+          "color": {
+            "description": "Color is the color value for a given index (empty is undefined)",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "description": {
+            "description": "Description of the enum state",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "icon": {
+            "description": "Icon supports setting an icon for a given index value",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "text": {
+            "description": "Value is the string display value for a given index",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "SupportedTransformationTypes": {
+        "type": "string"
+      },
+      "Notice": {
+        "properties": {
+          "inspect": {
+            "type": "integer",
+            "format": "int64",
+            "title": "InspectType is a type for the Inspect property of a Notice."
+          },
+          "link": {
+            "description": "Link is an optional link for display in the user interface and can be an\nabsolute URL or a path relative to Grafana's root url.",
+            "type": "string"
+          },
+          "severity": {
+            "type": "integer",
+            "format": "int64",
+            "title": "NoticeSeverity is a type for the Severity property of a Notice."
+          },
+          "text": {
+            "description": "Text is freeform descriptive text for the notice.",
+            "type": "string"
+          }
+        },
+        "title": "Notice provides a structure for presenting notifications in Grafana's user interface.",
+        "type": "object"
+      },
+      "FrameLabels": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "description": "Labels are used to add metadata to an object.  The JSON will always be sorted keys",
+        "type": "object"
+      },
+      "ExplorePanelsState": {
+        "description": "This is an object constructed with the keys as the values of the enum VisType and the value being a bag of properties"
+      },
+      "VisType": {
+        "title": "VisType is used to indicate how the data should be visualized in explore.",
+        "type": "string"
+      },
+      "TimeRange": {
+        "description": "Redefining this to avoid an import cycle",
+        "properties": {
+          "from": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "to": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ThresholdsMode": {
+        "description": "ThresholdsMode absolute or percentage",
+        "type": "string"
+      },
+      "InspectType": {
+        "format": "int64",
+        "title": "InspectType is a type for the Inspect property of a Notice.",
+        "type": "integer"
+      },
+      "NoticeSeverity": {
+        "format": "int64",
+        "title": "NoticeSeverity is a type for the Severity property of a Notice.",
+        "type": "integer"
+      }
+    }
+  },
+  "info": {
+    "contact": {
+      "email": "hello@grafana.com",
+      "name": "Grafana Labs",
+      "url": "https://grafana.com"
+    },
+    "description": "The Grafana backend exposes an HTTP API, the same API is used by the frontend to do\neverything from saving dashboards, creating users and updating data sources.",
+    "title": "Grafana HTTP API.",
+    "version": "0.0.1"
+  },
+  "openapi": "3.0.3",
+  "paths": {
+    "/api/datasources": {
+      "get": {
+        "description": "Get all data sources configured in Grafana. Use this to discover available Prometheus datasources and their UIDs, which are required for querying metrics.\n\nIf you are running Grafana Enterprise and have Fine-grained access control enabled you need to have a permission with action: `datasources:read` and scope: `datasources:*`.",
+        "operationId": "getDataSources",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/getDataSourcesResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/unauthorisedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalServerError"
+          }
+        },
+        "summary": "Get all data sources.",
+        "tags": [
+          "datasources"
+        ]
+      }
+    },
+    "/api/ds/query": {
+      "post": {
+        "description": "Query Prometheus metrics using PromQL expressions. ALWAYS call getDataSources first to get Prometheus datasource UID.\n\nKUBERNETES PROMQL PATTERNS:\n\nPOD STATUS:\n- CrashLoopBackOff: kube_pod_container_status_waiting_reason{reason=\"CrashLoopBackOff\"}\n- ImagePullBackOff: kube_pod_container_status_waiting_reason{reason=\"ImagePullBackOff\"}\n- Failed pods: kube_pod_status_phase{phase=\"Failed\"}\n- Pending pods: kube_pod_status_phase{phase=\"Pending\"}\n- Running pods: kube_pod_status_phase{phase=\"Running\",namespace=\"prod\"}\n- Restarts: kube_pod_container_status_restarts_total{namespace=\"test\"}\n- High restarts: kube_pod_container_status_restarts_total > 5\n\nCPU METRICS:\n- By pod: sum(rate(container_cpu_usage_seconds_total{namespace=\"test\",pod!=\"\"}[5m])) by (pod)\n- Top 1 CPU: topk(1,sum(rate(container_cpu_usage_seconds_total{namespace=\"test\",pod!=\"\"}[5m])) by (pod))\n- Top 5 CPU: topk(5,sum(rate(container_cpu_usage_seconds_total{namespace=\"test\",pod!=\"\"}[5m])) by (pod))\n- By namespace: sum(rate(container_cpu_usage_seconds_total{pod!=\"\"}[5m])) by (namespace)\n\nMEMORY METRICS:\n- By pod (bytes): sum(container_memory_working_set_bytes{namespace=\"test\",pod!=\"\"}) by (pod)\n- By pod (MB): sum(container_memory_working_set_bytes{namespace=\"test\",pod!=\"\"}) by (pod)/1024/1024\n- Top memory: topk(1,sum(container_memory_working_set_bytes{namespace=\"test\",pod!=\"\"}) by (pod))\n- By namespace: sum(container_memory_working_set_bytes{pod!=\"\"}) by (namespace)\n\nNETWORK:\n- RX rate: sum(rate(container_network_receive_bytes_total{namespace=\"test\"}[5m])) by (pod)\n- TX rate: sum(rate(container_network_transmit_bytes_total{namespace=\"test\"}[5m])) by (pod)\n\nDEPLOYMENTS:\n- Replicas: kube_deployment_status_replicas{namespace=\"prod\"}\n- Available: kube_deployment_status_replicas_available{namespace=\"prod\"}\n- Unavailable: kube_deployment_status_replicas_unavailable{namespace=\"prod\"}\n\nCRITICAL RULES:\n1. ALWAYS filter empty pods: pod!=\"\"\n2. ALWAYS use rate() for CPU counters: rate(...[5m])\n3. ALWAYS aggregate: by (pod), by (namespace), or by (node)\n4. For top N queries: topk(N, query)\n5. Replace namespace=\"test\" with actual namespace from user question\n\nTIME RANGES: Use now-5m, now-15m, now-1h, now-3h, now-24h, now-7d\n\nQUERY FORMAT: {\"from\":\"now-1h\",\"to\":\"now\",\"queries\":[{\"refId\":\"A\",\"datasource\":{\"uid\":\"PROMETHEUS_UID\"},\"expr\":\"YOUR_PROMQL\"}]}\n\nPromQL Reference: https://prometheus.io/docs/prometheus/latest/querying/basics/",
+        "operationId": "queryMetricsWithExpressions",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MetricRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-originalParamName": "body"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/queryMetricsWithExpressionsRespons"
+          },
+          "207": {
+            "$ref": "#/components/responses/queryMetricsWithExpressionsRespons"
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/unauthorisedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalServerError"
+          }
+        },
+        "summary": "Query Prometheus metrics with PromQL. Call getDataSources first to get Prometheus UID.",
+        "tags": [
+          "datasources"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "tags": [
+    {
+      "description": "If you are running Grafana Enterprise and have Fine-grained access control enabled, for some endpoints you would need to have relevant permissions. Refer to specific resources to understand what permissions are required.",
+      "name": "datasources"
+    }
+  ]
+}
